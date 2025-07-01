@@ -20,15 +20,6 @@ def generate_sudoku():
     puzzle = Sudoku(3).difficulty(0.5)  # tingkat kesulitan sedang
     return puzzle.board, puzzle.solve().board
 
-if "puzzle" not in st.session_state:
-    try:
-        from sudoku import Sudoku
-        st.session_state["puzzle"], st.session_state["solution"] = generate_sudoku()
-        st.session_state["user_input"] = np.copy(st.session_state["puzzle"])
-    except ModuleNotFoundError:
-        st.error("Silakan install library `sudoku` dengan perintah: `pip install sudoku` di terminal.")
-        st.stop()
-
 # Reset tombol
 if st.button("🔄 Reset Game"):
     st.session_state["puzzle"], st.session_state["solution"] = generate_sudoku()
