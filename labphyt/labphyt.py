@@ -11,18 +11,24 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
+st.set_option('deprecation.showPyplotGlobalUse', False)  # Supaya tidak muncul warning matplotlib
+
 def draw_right_triangle(a, b):
-    # Titik-titik segitiga siku-siku
+    c = np.sqrt(a**2 + b**2)
+    # Koordinat titik segitiga siku-siku
     x = [0, a, 0, 0]
     y = [0, 0, b, 0]
+    
     plt.figure(figsize=(5,5))
     plt.plot(x, y, 'b-', linewidth=3)
-    plt.fill(x, y, 'skyblue', alpha=0.3)
+    plt.fill(x, y, 'lightblue', alpha=0.4)
     plt.scatter([0, a, 0], [0, 0, b], color='red', zorder=5)
-    plt.text(a/2, -0.1, f'a = {a:.2f}', ha='center', fontsize=12)
-    plt.text(-0.1, b/2, f'b = {b:.2f}', va='center', rotation=90, fontsize=12)
-    c = np.sqrt(a**2 + b**2)
-    plt.text(a/2, b/2, f'c = {c:.2f}', fontsize=12, color='darkgreen')
+    
+    # Label sisi
+    plt.text(a/2, -0.05*max(a,b), f'a = {a:.2f}', ha='center', fontsize=12)
+    plt.text(-0.05*max(a,b), b/2, f'b = {b:.2f}', va='center', rotation=90, fontsize=12)
+    plt.text(a/2, b/2, f'c = {c:.2f}', fontsize=12, color='green')
+    
     plt.title("Segitiga Siku-Siku Phytagoras")
     plt.axis('equal')
     plt.axis('off')
@@ -33,19 +39,30 @@ def draw_right_triangle(a, b):
 def main():
     st.title("Laboratorium Phytagoras")
 
-    # Sidebar menu
     menu = st.sidebar.selectbox("Menu", ["Laboratorium", "Langkah Penggunaan"])
 
     if menu == "Langkah Penggunaan":
         st.header("Langkah-langkah Penggunaan Laboratorium Phytagoras")
         st.markdown("""
         1. Gunakan slider untuk mengatur panjang sisi \(a\) dan sisi \(b\) segitiga siku-siku.
-        2. Panjang sisi miring \(c\) akan dihitung otomatis berdasarkan rumus Phytagoras:
+        2. Panjang sisi miring \(c\) akan dihitung otomatis menggunakan rumus:
            \[
            c = \sqrt{a^2 + b^2}
            \]
-        3. Visual segitiga siku-siku akan diperbarui secara interaktif sesuai nilai sisi \(a\) dan \(b\).
-        4. Gunakan menu untuk berpindah antara tampilan laboratorium dan panduan penggunaan.
+        3. Visual segitiga akan diperbarui secara interaktif sesuai nilai sisi \(a\) dan \(b\).
+        4. Gunakan menu di sidebar untuk berpindah antara tampilan laboratorium dan panduan penggunaan.
+        """)
+
+    else:
+        st.header("Laboratorium Phytagoras")
+        a = st.slider("Pilih panjang sisi a", min_value=1.0, max_value=100.0, value=30.0, step=0.1)
+        b = st.slider("Pilih panjang sisi b", min_value=1.0, max_value=100.0, value=40.0, step=0.1)
+
+        c = draw_right_triangle(a, b)
+        st.markdown(f"### Panjang sisi miring (c) adalah: **{c:.2f}**")
+
+if __name__ == "__main__":
+    main()
         """)
 
     else:
