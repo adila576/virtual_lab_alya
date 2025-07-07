@@ -60,5 +60,3 @@ elif menu == "Eksperimen Pythagoras":
 
     fig, c = draw_triangle(a, b)
     st.pyplot(fig)
-
-    st.success(f"Panjang sisi miring (c) = √({a}² + {b}²) = {c}")
