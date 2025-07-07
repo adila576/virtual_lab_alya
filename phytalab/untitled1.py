@@ -35,10 +35,8 @@ if menu == "Tujuan Pembelajaran":
     st.title("🎯 Tujuan Pembelajaran")
     st.write("""
     Setelah menggunakan laboratorium ini, siswa diharapkan dapat:
-    - Menjelaskan konsep Teorema Pythagoras
-    - Mengidentifikasi sisi-sisi pada segitiga siku-siku
-    - Menggunakan rumus Pythagoras untuk menghitung sisi miring
-    - Memvisualisasikan segitiga berdasarkan panjang sisi
+    - Menemukan rumus phytagoras melalui visual segitiga siku-siku secara konkrit
+    - Memahami dan menjelaskan keterkaitan antara panjang sisi-sisi segitiga tersebut
     """)
 
 # Halaman 2: Cara Memakai
