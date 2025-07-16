@@ -9,10 +9,10 @@ Original file is located at
 import streamlit as st
 import numpy as np
 import random
+from streamlit_extras.let_it_rain import rain
 
 # Fungsi untuk membuat puzzle Sudoku sederhana
 def generate_sudoku():
-    # Solusi Sudoku valid sederhana
     base_solution = [
         [5,3,4,6,7,8,9,1,2],
         [6,7,2,1,9,5,3,4,8],
@@ -50,7 +50,6 @@ for i in range(9):
     row = []
     for j in range(9):
         if st.session_state.puzzle[i][j] != 0:
-            # Angka yang sudah fixed
             cols[j].text_input("", str(st.session_state.puzzle[i][j]), disabled=True, key=f"fixed-{i}-{j}")
             row.append(st.session_state.puzzle[i][j])
         else:
@@ -72,37 +71,14 @@ if st.button("✅ Cek Jawaban"):
     
     if correct:
         st.success("Selamat! Sudoku selesai dengan benar! 🎉")
-        # Menjalankan konfetti dengan JS
-        st.markdown(
-            """
-            <script>
-            const duration = 5000;
-            const end = Date.now() + duration;
-
-            (function frame() {
-              confetti({
-                particleCount: 5,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0 }
-              });
-              confetti({
-                particleCount: 5,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1 }
-              });
-
-              if (Date.now() < end) {
-                requestAnimationFrame(frame);
-              }
-            }());
-            </script>
-            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-            """,
-            unsafe_allow_html=True
+        
+        # Konfetti dengan streamlit-extras
+        rain(
+            emoji="🎉",
+            font_size=54,
+            falling_speed=5,
+            animation_length="5"
         )
     else:
         st.error("Masih ada yang salah. Coba lagi!")
 
-    
