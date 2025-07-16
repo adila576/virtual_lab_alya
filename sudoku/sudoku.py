@@ -10,58 +10,99 @@ import streamlit as st
 import numpy as np
 import random
 
-st.set_page_config(page_title="🎮 Game Sudoku", layout="centered")
-
-st.title("🧩 Game Sudoku Sederhana")
-
-# Inisialisasi papan sudoku (9x9)
+# Fungsi untuk membuat puzzle Sudoku sederhana
 def generate_sudoku():
-    from sudoku import Sudoku
-    puzzle = Sudoku(3).difficulty(0.5)  # tingkat kesulitan sedang
-    return puzzle.board, puzzle.solve().board
+    # Solusi Sudoku valid sederhana
+    base_solution = [
+        [5,3,4,6,7,8,9,1,2],
+        [6,7,2,1,9,5,3,4,8],
+        [1,9,8,3,4,2,5,6,7],
+        [8,5,9,7,6,1,4,2,3],
+        [4,2,6,8,5,3,7,9,1],
+        [7,1,3,9,2,4,8,5,6],
+        [9,6,1,5,3,7,2,8,4],
+        [2,8,7,4,1,9,6,3,5],
+        [3,4,5,2,8,6,1,7,9]
+    ]
+    
+    puzzle = np.array(base_solution)
+    
+    # Hilangkan beberapa angka untuk jadi puzzle
+    for _ in range(40):
+        i, j = random.randint(0,8), random.randint(0,8)
+        puzzle[i][j] = 0
+        
+    return base_solution, puzzle
 
-# Reset tombol
-if st.button("🔄 Reset Game"):
-    st.session_state["puzzle"], st.session_state["solution"] = generate_sudoku()
-    st.session_state["user_input"] = np.copy(st.session_state["puzzle"])
+# Inisialisasi session state
+if "solution" not in st.session_state:
+    solution, puzzle = generate_sudoku()
+    st.session_state.solution = solution
+    st.session_state.puzzle = puzzle
 
-# Tampilkan grid input
-def draw_grid():
+st.title("🧩 Sudoku Game")
+st.write("Isi grid Sudoku dan tekan **Cek Jawaban**. Jika benar, akan muncul konfetti! 🎉")
+
+# Tampilan Sudoku grid
+grid = []
+for i in range(9):
+    cols = st.columns(9)
+    row = []
+    for j in range(9):
+        if st.session_state.puzzle[i][j] != 0:
+            # Angka yang sudah fixed
+            cols[j].text_input("", str(st.session_state.puzzle[i][j]), disabled=True, key=f"fixed-{i}-{j}")
+            row.append(st.session_state.puzzle[i][j])
+        else:
+            val = cols[j].text_input("", "", max_chars=1, key=f"input-{i}-{j}")
+            try:
+                row.append(int(val))
+            except:
+                row.append(0)
+    grid.append(row)
+
+# Tombol cek jawaban
+if st.button("✅ Cek Jawaban"):
+    correct = True
     for i in range(9):
-        cols = st.columns(9)
         for j in range(9):
-            cell_value = st.session_state["puzzle"][i][j]
-            key = f"{i}-{j}"
-            if cell_value != 0:
-                cols[j].markdown(f"<div style='padding:8px; background-color:#eee; text-align:center; border-radius:4px'><b>{cell_value}</b></div>", unsafe_allow_html=True)
-            else:
-                user_input = cols[j].text_input("", value=str(st.session_state["user_input"][i][j]) if st.session_state["user_input"][i][j] != 0 else "",
-                                                max_chars=1, key=key)
-                try:
-                    val = int(user_input)
-                    if 1 <= val <= 9:
-                        st.session_state["user_input"][i][j] = val
-                    else:
-                        st.session_state["user_input"][i][j] = 0
-                except:
-                    st.session_state["user_input"][i][j] = 0
+            if grid[i][j] != st.session_state.solution[i][j]:
+                correct = False
+                break
+    
+    if correct:
+        st.success("Selamat! Sudoku selesai dengan benar! 🎉")
+        # Menjalankan konfetti dengan JS
+        st.markdown(
+            """
+            <script>
+            const duration = 5000;
+            const end = Date.now() + duration;
 
-draw_grid()
+            (function frame() {
+              confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 }
+              });
+              confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 }
+              });
 
-# Tombol cek solusi
-if st.button("✅ Cek Solusi"):
-    if np.array_equal(st.session_state["user_input"], st.session_state["solution"]):
-        st.success("🎉 Selamat! Kamu berhasil menyelesaikan Sudoku!")
-        st.balloons()
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
+            </script>
+            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+            """,
+            unsafe_allow_html=True
+        )
     else:
-        st.warning("😢 Masih ada yang salah. Coba lagi!")
+        st.error("Masih ada yang salah. Coba lagi!")
 
-# Petunjuk
-with st.expander("📌 Cara Bermain"):
-    st.markdown("""
-    - Isilah angka 1 sampai 9 di setiap baris, kolom, dan kotak 3x3 tanpa pengulangan.
-    - Kotak abu-abu adalah angka tetap yang tidak bisa diubah.
-    - Tekan **Cek Solusi** untuk memeriksa jawabanmu.
-    - Tekan **Reset Game** untuk memulai ulang dengan puzzle baru.
-    """)
     
