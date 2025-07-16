@@ -1,3 +1,5 @@
 streamlit
-numpy
-random
+pdfplumber
+python-docx
+openpyxl
+pandas
